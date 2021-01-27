@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,21 @@ public class CustomGlobalExceptionHandler {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
+        });
+        return ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .errors(errors)
+                .build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ErrorResponse handleConstraintViolated(ConstraintViolationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getConstraintViolations().forEach(constraintViolation -> {
+            String message = constraintViolation.getMessage();
+            String propertyPath = constraintViolation.getPropertyPath().toString();
+            errors.put(propertyPath, message);
         });
         return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
