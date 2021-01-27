@@ -5,6 +5,8 @@ import com.rms.reservationservice.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/reservation")
 public class ReservationController {
@@ -16,7 +18,7 @@ public class ReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Reservation save(@RequestBody Reservation reservation) {
+    public Reservation save(@Valid @RequestBody Reservation reservation) {
         return reservationService.saveReservation(reservation);
     }
 
